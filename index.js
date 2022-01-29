@@ -15,11 +15,12 @@ User.belongsTo(Company);
 User.belongsToMany(List, { through: 'user-list' });
 List.belongsToMany(User, { through: 'user-list' });
 List.hasMany(Task);
-
-Task.belongsTo(List);
-Task.hasMany(Taskdata);
+Task.hasOne(Taskdata);
 Taskdata.belongsTo(Task);
-List.hasMany(Listdata);
+Task.belongsTo(List);
+
+
+List.hasOne(Listdata);
 Listdata.belongsTo(List);
 
 sequelize.sync({ force: true }).then(async (result) => {
@@ -32,14 +33,21 @@ sequelize.sync({ force: true }).then(async (result) => {
     const list = await List.create({ name: 'list1' });
     await user.addList(list);
     //  const task = await Task.create({ name: "task1" })
+    const listdetails = await Listdata.create({ name: "list-data1" });
+    await listdetails.setList(list);
+
+
     const ListTask = await list.createTask({ name: "task1" });
-    const datatask = await Taskdata.create({ name: "dataoftask1" });
     //adding task data
-    await ListTask.addTaskdata(datatask);
+    const taskdetails = await Taskdata.create({ name: "details of task 1" });
+    await taskdetails.setTask(ListTask);
+    {/*}
+    //await ListTask.createTaskdata(datatask);
     const datalist = await Listdata.create({ name: "dataoflist1" });
     //adding listdata
-    await list.addListdata(datalist);
-
+    await list.setListdata(datalist)
+    //await list.createListdata(datalist);
+*/}
     const fetchedData = await Company.findAll({
 
         include: [
